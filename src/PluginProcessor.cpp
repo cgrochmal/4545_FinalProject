@@ -290,7 +290,9 @@ void Musi45effectAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBu
         {
             
             lfo = myLFO.tick();         // lfo varies between -1.0 and 1.0
-            //cout << lfo << endl;
+            pan = (lfo+1)/2;
+            leftgain = cos(pan*(PI/2.0f));
+            rightgain = sin((pan)*(PI/2.0f));
             calcDelays(lfo);
             calcFBW();
         }
@@ -301,8 +303,8 @@ void Musi45effectAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBu
         delayL.tick(inSampL + feedback*(tempL));
         delayR.tick(inSampR + feedback*(tempR));
         
-        channelDataL[i] = channelDataL[i] + wet*tempL;
-        channelDataR[i] = channelDataR[i] + wet*tempR;
+        channelDataL[i] = leftgain*(channelDataL[i] + wet*tempL);
+        channelDataR[i] = rightgain*(channelDataR[i] + wet*tempR);
     }
 }
 
