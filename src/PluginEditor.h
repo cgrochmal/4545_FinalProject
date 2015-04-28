@@ -65,7 +65,13 @@ private:
     
     Time tempoTimer;
     int current;
-    int previous; 
+    int previous;
+    
+    int firstInterval;
+    int secondInterval;
+    int thirdInterval;
+    int fourthInterval; 
+    
    // Timer * previous;
    // Timer * clockstaken;
     // STEP 3.5 - Add a method that returns a pointer to the Processor object. This is how the Editor can send data to the processor

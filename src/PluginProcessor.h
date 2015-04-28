@@ -116,6 +116,7 @@ private:
     const int cntrlN = 10;          // the number of audio samples to process before processing control rate stuff
     long unsigned cntrlCounter;     // a counter for control rate stuff
     float lfo, depth;
+    float leftgain, rightgain, pan;
     
     // Filters
     stk::DelayA delayL, delayR;             // The delays
