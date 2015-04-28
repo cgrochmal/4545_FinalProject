@@ -110,7 +110,9 @@ tempoTimer()
     tempoTimer = tempoTimer.getCurrentTime();
     //previous = clock();
     previous = tempoTimer.currentTimeMillis();
-   
+    firstInterval = 0;
+    secondInterval = 0;
+    thirdInterval = 0;
 
     
     
@@ -205,12 +207,20 @@ void Musi45effectAudioProcessorEditor::buttonClicked(Button * button)
         
         current = tempoTimer.currentTimeMillis();
         
-        double timeIntervalMs = current - previous;
+        int newtimeIntervalMs = current - previous;
         
         //tempoTimer->stopTimer();
         //tempoTimer->startTimer(20);
         
         
+        //average the most recent 4 time intervals
+        
+        fourthInterval = thirdInterval;
+        thirdInterval = secondInterval;
+        secondInterval = firstInterval;
+        firstInterval = newtimeIntervalMs;
+        
+        double avg = (fourthInterval + thirdInterval + secondInterval + firstInterval)/3;
         
         
         //clockstaken = current - previous;
@@ -218,9 +228,10 @@ void Musi45effectAudioProcessorEditor::buttonClicked(Button * button)
         //double timeInSeconds = clockstaken / (double) CLOCKS_PER_SEC;
         //double timeInMs = timeInSeconds * 1000;
         
-         std::cout << 60000/timeIntervalMs << std::endl;
+         std::cout << newtimeIntervalMs << std::endl;
         
-        int bpm = 60000/timeIntervalMs;
+        
+        int bpm = 60000/avg;
         
         
         
@@ -229,6 +240,8 @@ void Musi45effectAudioProcessorEditor::buttonClicked(Button * button)
         
         
         previous = current;
+        
+  
         
        
         
