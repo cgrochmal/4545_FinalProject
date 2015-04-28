@@ -14,7 +14,7 @@
 
 //==============================================================================
 Musi45effectAudioProcessorEditor::Musi45effectAudioProcessorEditor (Musi45effectAudioProcessor& p)
-:   AudioProcessorEditor (&p), processor (p),         // initialize slider with UI component name
+:   AudioProcessorEditor (&p), processor (p),
 lfoDepthSlider("LfoSpeed"),
 lfoSpeedSlider("LfoDepth %"),
 feedbackSlider("Feedback %"),
@@ -25,8 +25,12 @@ lfoDepthLabel("","LFO Depth %"),
 lfoSpeedLabel("","LFO Speed Hz"),
 feedbackLabel("", "Feedback %"),
 delayTimeLabel("", "Delay (ms)"),
-wetLabel("", "Wet %")
+wetLabel("", "Wet %"),
+tempoTimer()
+
 {
+    
+    
     float labelFontSize = 12.0;
     
     lfoDepthLabel.setColour(juce::Label::textColourId, juce::Colour(255, 255, 255));
@@ -87,10 +91,10 @@ wetLabel("", "Wet %")
     preset1.addListener(this);
     
     tapdelay.setButtonText("Tap Delay");
-    tapdelay.setClickingTogglesState(true);
+    //tapdelay.setClickingTogglesState(true);
     addAndMakeVisible(tapdelay);
     tapdelay.addListener(this);
-    tapdelay.setTriggeredOnMouseDown(false);
+    //tapdelay.setTriggeredOnMouseDown(false);
     addAndMakeVisible(delaytime);
     
     // Preset1
@@ -102,6 +106,14 @@ wetLabel("", "Wet %")
     
     // STEP 5.4 - start the timer
     startTimer (80);      // timerCallback() will get called every N msec.
+    
+    tempoTimer = tempoTimer.getCurrentTime();
+    //previous = clock();
+    previous = tempoTimer.currentTimeMillis();
+   
+
+    
+    
 }
 
 Musi45effectAudioProcessorEditor::~Musi45effectAudioProcessorEditor()
@@ -166,6 +178,9 @@ void Musi45effectAudioProcessorEditor::sliderValueChanged (Slider* slider)
     
     // then call setParameter with the vst normalized value
     getProcessor().setParameterNotifyingHost(paramIndex, vstVal);
+    
+    
+ 
 }
 
 // button callback
@@ -174,23 +189,49 @@ void Musi45effectAudioProcessorEditor::buttonClicked(Button * button)
     
     if (button == &tapdelay) {
         /*if(tapdelay.getToggleState()) {
-            float vstVal, sliderVal;
-            int paramIndex;
-            String time = std::to_string(tapdelay.getMillisecondsSinceButtonDown());
-            delaytime.setText(time);
-            std::cout << tapdelay.getMillisecondsSinceButtonDown() << std::endl;
-            std::cout << time << std::endl;
-            paramIndex = Musi45effectAudioProcessor::delayTimeParam;
-            sliderVal = tapdelay.getMillisecondsSinceButtonDown();
-            vstVal = getProcessor().usrParams[paramIndex].setWithUparam(sliderVal);
-            getProcessor().setParameterNotifyingHost(paramIndex, vstVal);
-        }*/
-        //if(((clock()-previous)/(double) CLOCKS_PER_SEC)* ) {
-        current = clock();
-        clockstaken = current - previous;
-        double timeInSeconds = clockstaken / (double) CLOCKS_PER_SEC;
-        double timeInMs = timeInSeconds * 1000;
+         float vstVal, sliderVal;
+         int paramIndex;
+         String time = std::to_string(tapdelay.getMillisecondsSinceButtonDown());
+         delaytime.setText(time);
+         std::cout << tapdelay.getMillisecondsSinceButtonDown() << std::endl;
+         std::cout << time << std::endl;
+         paramIndex = Musi45effectAudioProcessor::delayTimeParam;
+         sliderVal = tapdelay.getMillisecondsSinceButtonDown();
+         vstVal = getProcessor().usrParams[paramIndex].setWithUparam(sliderVal);
+         getProcessor().setParameterNotifyingHost(paramIndex, vstVal);
+         }*/
+        //if(((clock()-previous)/(double) CLOCKS_PE_SEC)* ) {
+        //current = clock();
+        
+        current = tempoTimer.currentTimeMillis();
+        
+        double timeIntervalMs = current - previous;
+        
+        //tempoTimer->stopTimer();
+        //tempoTimer->startTimer(20);
+        
+        
+        
+        
+        //clockstaken = current - previous;
+        
+        //double timeInSeconds = clockstaken / (double) CLOCKS_PER_SEC;
+        //double timeInMs = timeInSeconds * 1000;
+        
+         std::cout << 60000/timeIntervalMs << std::endl;
+        
+        int bpm = 60000/timeIntervalMs;
+        
+        
+        
+            delaytime.setText(std::to_string(bpm));
+        
+        
+        
         previous = current;
+        
+       
+        
     }
     
 }

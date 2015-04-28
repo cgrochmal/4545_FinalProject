@@ -59,9 +59,15 @@ private:
     
     // Add any other private variables you need here.
     
-    std::clock_t current;
-    std::clock_t previous;
-    std::clock_t clockstaken;
+//    std::clock_t current;
+//    std::clock_t previous;
+//    std::clock_t clockstaken;
+    
+    Time tempoTimer;
+    int current;
+    int previous; 
+   // Timer * previous;
+   // Timer * clockstaken;
     // STEP 3.5 - Add a method that returns a pointer to the Processor object. This is how the Editor can send data to the processor
     Musi45effectAudioProcessor& getProcessor() const
     {
