@@ -220,7 +220,7 @@ void Musi45effectAudioProcessorEditor::buttonClicked(Button * button)
         secondInterval = firstInterval;
         firstInterval = newtimeIntervalMs;
         
-        double avg = (fourthInterval + thirdInterval + secondInterval + firstInterval)/3;
+        double avg = (fourthInterval + thirdInterval + secondInterval + firstInterval)/4;
         
         
         //clockstaken = current - previous;
