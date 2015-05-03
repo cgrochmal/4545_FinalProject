@@ -31,6 +31,10 @@ Musi45effectAudioProcessor::Musi45effectAudioProcessor()
     
     usrParams[wetParam].setMinMax(minW, maxW);
     usrParams[wetParam].setWithUparam(defW);
+    
+    usrParams[dryParam].setMinMax(minW, maxW);
+    usrParams[dryParam].setWithUparam(defW);
+
 }
 
 Musi45effectAudioProcessor::~Musi45effectAudioProcessor()
@@ -85,6 +89,8 @@ void Musi45effectAudioProcessor::setParameter (int index, float newValue)
             break;
         case wetParam:
             break;
+        case dryParam:
+            break;
         default:
             break;
     }
@@ -105,6 +111,8 @@ float Musi45effectAudioProcessor::getParameterDefaultValue (int index)
             return defD;
         case wetParam:
             return defW;
+        case dryParam:
+            return defW; //todo: defD
         default:
             break;
     }
@@ -126,7 +134,9 @@ const String Musi45effectAudioProcessor::getParameterName (int index)
         case delayTimeParam:
             return "Delay Time";
         case wetParam:
-            return "Wet Amount";
+            return "Wet Gain";
+        case dryParam:
+            return "Dry Gain";
         default:
             break;
     }

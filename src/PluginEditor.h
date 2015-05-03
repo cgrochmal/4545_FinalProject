@@ -46,7 +46,18 @@ private:
     Slider feedbackSlider;
     Slider delayTimeSlider;
     Slider wetSlider;
+    Slider drySlider;
+    
     TextButton preset1;
+    TextButton preset2;
+    TextButton preset3;
+    TextButton preset4;
+    
+    TextButton set1;
+    TextButton set2;
+    TextButton set3;
+    TextButton set4;
+    
     TextButton tapdelay;
     TextEditor delaytime;
     
@@ -56,6 +67,7 @@ private:
     Label feedbackLabel;
     Label delayTimeLabel;
     Label wetLabel;
+    Label dryLabel;
     
     // Add any other private variables you need here.
     

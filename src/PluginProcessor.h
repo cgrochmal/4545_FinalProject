@@ -99,6 +99,7 @@ public:
         feedbackParam,
         delayTimeParam,
         wetParam,
+        dryParam,
         totalNumParams      // must end with this variable
     };
     
@@ -110,7 +111,7 @@ private:
     //==============================================================================
     
     float fs;
-    float feedback, wet;
+    float feedback, wet, dry;
     
     // stuff for doing control rate
     const int cntrlN = 10;          // the number of audio samples to process before processing control rate stuff

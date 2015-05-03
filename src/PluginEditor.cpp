@@ -20,16 +20,16 @@ lfoSpeedSlider("LfoDepth %"),
 feedbackSlider("Feedback %"),
 delayTimeSlider("Delay Time"),
 wetSlider("Wet %"),
-tapdelay("Tap Delay"),
+tapdelay("Tap Tempo"),
 lfoDepthLabel("","LFO Depth %"),
-lfoSpeedLabel("","LFO Speed Hz"),
+lfoSpeedLabel("","LFO Speed (Hz)"),
 feedbackLabel("", "Feedback %"),
 delayTimeLabel("", "Delay (ms)"),
-wetLabel("", "Wet %"),
+wetLabel("", "Wet Gain"),
+dryLabel("", "Dry Gain"),
 tempoTimer()
 
 {
-    
     
     float labelFontSize = 12.0;
     
@@ -38,6 +38,7 @@ tempoTimer()
     feedbackLabel.setColour(juce::Label::textColourId, juce::Colour(255, 255, 255));
     delayTimeLabel.setColour(juce::Label::textColourId, juce::Colour(255, 255, 255));
     wetLabel.setColour(juce::Label::textColourId, juce::Colour(255, 255, 255));
+    dryLabel.setColour(juce::Label::textColourId, juce::Colour(255, 255, 255));
     
     // LFO depth
     lfoDepthSlider.setSliderStyle(Slider::LinearVertical);  // what kind of slider?
@@ -77,7 +78,7 @@ tempoTimer()
     delayTimeLabel.attachToComponent (&delayTimeSlider, false);
     delayTimeLabel.setFont(Font (labelFontSize));
     
-    // Wet Amount
+    // Wet Gain
     wetSlider.setSliderStyle(Slider::LinearVertical);  // what kind of slider?
     wetSlider.setTextBoxStyle(Slider::TextBoxBelow, false, 60, 20);
     wetSlider.setRange(minW, maxW, 1);
@@ -86,11 +87,52 @@ tempoTimer()
     wetLabel.attachToComponent (&wetSlider, false);
     wetLabel.setFont(Font (labelFontSize));
     
-    preset1.setButtonText("Preset 1");
+    // Dry Gain
+    drySlider.setSliderStyle(Slider::LinearVertical);  // what kind of slider?
+    drySlider.setTextBoxStyle(Slider::TextBoxBelow, false, 60, 20);
+    drySlider.setRange(minW, maxW, 1);
+    addAndMakeVisible(drySlider);                      // add the slider to the GUI
+    drySlider.addListener(this);                       // add a listener for this function
+    dryLabel.attachToComponent (&drySlider, false);
+    dryLabel.setFont(Font (labelFontSize));
+    
+    
+    //presets
+    preset1.setButtonText("1");
     addAndMakeVisible(preset1);
     preset1.addListener(this);
     
-    tapdelay.setButtonText("Tap Delay");
+    preset2.setButtonText("2");
+    addAndMakeVisible(preset2);
+    preset2.addListener(this);
+    
+    preset3.setButtonText("3");
+    addAndMakeVisible(preset3);
+    preset3.addListener(this);
+    
+    preset4.setButtonText("4");
+    addAndMakeVisible(preset4);
+    preset4.addListener(this);
+    
+    
+    //set presets
+    set1.setButtonText("Set 1");
+    addAndMakeVisible(set1);
+    set1.addListener(this);
+    
+    set2.setButtonText("Set 2");
+    addAndMakeVisible(set2);
+    set2.addListener(this);
+    
+    set3.setButtonText("Set 3");
+    addAndMakeVisible(set3);
+    set3.addListener(this);
+    
+    set4.setButtonText("Set 4");
+    addAndMakeVisible(set4);
+    set4.addListener(this);
+    
+    tapdelay.setButtonText("Tap Tempo");
     //tapdelay.setClickingTogglesState(true);
     addAndMakeVisible(tapdelay);
     tapdelay.addListener(this);
@@ -102,7 +144,7 @@ tempoTimer()
     
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (700, 300);
+    setSize (550, 400);
     
     // STEP 5.4 - start the timer
     startTimer (80);      // timerCallback() will get called every N msec.
@@ -131,20 +173,48 @@ void Musi45effectAudioProcessorEditor::paint (Graphics& g)
     g.setColour (Colours::white);
     g.setFont (15.0f);
     g.drawFittedText ("FLORUS", getLocalBounds(), Justification::centredTop, 1);
+    g.drawFittedText("Presets", 150, 265, 100, 50, Justification::centred, 1);
+    g.drawFittedText("BPM", 465, 335, 100, 50, Justification::centred, 1);
+    
+    g.drawLine(185, 40, 185, 275, 2);
+    g.drawLine(435, 40, 435, 400, 2);
+    
+    g.drawLine(0, 275, 435, 275, 2);
+    g.drawLine(0, 40, 550, 40, 2);
+
+
 }
 
 void Musi45effectAudioProcessorEditor::resized()
 {
     // Set the position and size of the slider objects
-    int w = 80; int h = 200; int x = 40; int y = 60;
-    lfoDepthSlider.setBounds(x, y, w, h); x += w;
-    lfoSpeedSlider.setBounds(x, y, w, h); x += w;
-    feedbackSlider.setBounds(x, y, w, h); x += w;
-    delayTimeSlider.setBounds(x, y, w, h); x += w;
-    wetSlider.setBounds(x, y, w, h); x += w;
-    preset1.setBounds(x, y-20, w, h/2);
-    tapdelay.setBounds(x, y*2+40, w, h/2); x+=w;
-    delaytime.setBounds(x, y*2+40, w, h/2);
+    int w = 80; int h = 400; int x = 40; int y = 60;
+    wetSlider.setBounds(x-20, y, w, h - 200); x += w;
+    drySlider.setBounds(x-20, y, w, h - 200); x += w;
+    lfoDepthSlider.setBounds(x - 10, y, w, h - 200); x += w;
+    lfoSpeedSlider.setBounds(x - 10, y, w, h - 200); x += w;
+    feedbackSlider.setBounds(x - 10, y, w, h - 200); x += w;
+    delayTimeSlider.setBounds(x+10, y, w, h - 200); x += w;
+
+    
+    //tapdelay.setBounds(x, y*2+40, 40, 40); x+=w;
+    //delaytime.setBounds(x, y*2+40, w, h/2); x = 60; y = 300;
+    
+    x = 60; y = 300;
+    
+    preset1.setBounds(x, y, 40, 40);
+    set1.setBounds(x, y + 50, 40, 40); x +=w;
+    preset2.setBounds(x, y, 40, 40);
+    set2.setBounds(x, y + 50, 40, 40); x +=w;
+    preset3.setBounds(x, y, 40, 40);
+    set3.setBounds(x, y + 50, 40, 40); x +=w;
+    preset4.setBounds(x, y, 40, 40);
+    set4.setBounds(x, y + 50, 40, 40); x +=w;
+    x += 60;
+    tapdelay.setBounds(x+10, y, 80, 40);
+    delaytime.setBounds(x + 15, y+50, 40, 20);
+ 
+
 }
 
 //==============================================================================
@@ -172,6 +242,9 @@ void Musi45effectAudioProcessorEditor::sliderValueChanged (Slider* slider)
     }
     else if (slider == &wetSlider){
         paramIndex = Musi45effectAudioProcessor::wetParam;
+    }
+    else if (slider == &drySlider){
+        paramIndex = Musi45effectAudioProcessor::dryParam;
     }
     
     // first set the usrParam from the slider, and get the vst normalized version of the uParam:
@@ -235,17 +308,42 @@ void Musi45effectAudioProcessorEditor::buttonClicked(Button * button)
         
         
         
-            delaytime.setText(std::to_string(bpm));
+        delaytime.setText(std::to_string(bpm));
         
+        int paramIndex = Musi45effectAudioProcessor::delayTimeParam;
+        getProcessor().usrParams[paramIndex].setWithUparam(avg);
         
         
         previous = current;
         
-  
         
-       
-        
-    }
+        }
+    
+        else if (button == &preset1){
+            
+        }
+        else if (button == &preset2){
+            
+        }
+        else if (button == &preset3){
+            
+        }
+        else if (button == &preset4){
+            
+        }
+        else if (button == &set1){
+            
+        }
+        else if (button == &set2){
+            
+        }
+        else if (button == &set3){
+            
+        }
+        else if (button == &set4){
+            
+        }
+    
     
 }
 
@@ -271,6 +369,7 @@ void Musi45effectAudioProcessorEditor::timerCallback()
     feedbackSlider.setValue(ourProc.usrParams[Musi45effectAudioProcessor::feedbackParam].getUparamVal(), dontSendNotification);
     delayTimeSlider.setValue(ourProc.usrParams[Musi45effectAudioProcessor::delayTimeParam].getUparamVal(), dontSendNotification);
     wetSlider.setValue(ourProc.usrParams[Musi45effectAudioProcessor::wetParam].getUparamVal(), dontSendNotification);
+    drySlider.setValue(ourProc.usrParams[Musi45effectAudioProcessor::dryParam].getUparamVal(), dontSendNotification);
     
 }
 
