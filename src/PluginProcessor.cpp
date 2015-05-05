@@ -257,6 +257,7 @@ void Musi45effectAudioProcessor::calcFBW()
 {
     feedback = usrParams[feedbackParam].getUparamVal() * .01;
     wet = usrParams[wetParam].getUparamVal() * .01;
+    dry = usrParams[dryParam].getUparamVal() * .01;
 }
 
 void Musi45effectAudioProcessor::calcFilterCoeffs()

@@ -36,8 +36,8 @@
 #define minW 0.0
 #define maxW 100.0
 #define minDr 0.0
-#define maxDr 1.0
-#define defDr 0.7
+#define maxDr 100.0
+#define defDr 80.0
 
 
 //==============================================================================
