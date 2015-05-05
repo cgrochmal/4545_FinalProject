@@ -155,7 +155,7 @@ tempoTimer()
     firstInterval = 0;
     secondInterval = 0;
     thirdInterval = 0;
-
+    
     
     
 }
@@ -181,8 +181,8 @@ void Musi45effectAudioProcessorEditor::paint (Graphics& g)
     
     g.drawLine(0, 275, 435, 275, 2);
     g.drawLine(0, 40, 550, 40, 2);
-
-
+    
+    
 }
 
 void Musi45effectAudioProcessorEditor::resized()
@@ -195,7 +195,7 @@ void Musi45effectAudioProcessorEditor::resized()
     lfoSpeedSlider.setBounds(x - 10, y, w, h - 200); x += w;
     feedbackSlider.setBounds(x - 10, y, w, h - 200); x += w;
     delayTimeSlider.setBounds(x+10, y, w, h - 200); x += w;
-
+    
     
     //tapdelay.setBounds(x, y*2+40, 40, 40); x+=w;
     //delaytime.setBounds(x, y*2+40, w, h/2); x = 60; y = 300;
@@ -213,8 +213,8 @@ void Musi45effectAudioProcessorEditor::resized()
     x += 60;
     tapdelay.setBounds(x+10, y, 80, 40);
     delaytime.setBounds(x + 15, y+50, 40, 20);
- 
-
+    
+    
 }
 
 //==============================================================================
@@ -255,7 +255,7 @@ void Musi45effectAudioProcessorEditor::sliderValueChanged (Slider* slider)
     getProcessor().setParameterNotifyingHost(paramIndex, vstVal);
     
     
- 
+    
 }
 
 // button callback
@@ -301,7 +301,7 @@ void Musi45effectAudioProcessorEditor::buttonClicked(Button * button)
         //double timeInSeconds = clockstaken / (double) CLOCKS_PER_SEC;
         //double timeInMs = timeInSeconds * 1000;
         
-         std::cout << newtimeIntervalMs << std::endl;
+        std::cout << newtimeIntervalMs << std::endl;
         
         
         int bpm = 60000/avg;
@@ -317,32 +317,32 @@ void Musi45effectAudioProcessorEditor::buttonClicked(Button * button)
         previous = current;
         
         
-        }
+    }
     
-        else if (button == &preset1){
-            
-        }
-        else if (button == &preset2){
-            
-        }
-        else if (button == &preset3){
-            
-        }
-        else if (button == &preset4){
-            
-        }
-        else if (button == &set1){
-            
-        }
-        else if (button == &set2){
-            
-        }
-        else if (button == &set3){
-            
-        }
-        else if (button == &set4){
-            
-        }
+    else if (button == &preset1){
+        usePreset(presets1);
+    }
+    else if (button == &preset2){
+        usePreset(presets2);
+    }
+    else if (button == &preset3){
+        usePreset(presets3);
+    }
+    else if (button == &preset4){
+        usePreset(presets4);
+    }
+    else if (button == &set1){
+        setPresets(presets1);
+    }
+    else if (button == &set2){
+        setPresets(presets2);
+    }
+    else if (button == &set3){
+        setPresets(presets3);
+    }
+    else if (button == &set4){
+        setPresets(presets4);
+    }
     
     
 }
@@ -373,4 +373,21 @@ void Musi45effectAudioProcessorEditor::timerCallback()
     
 }
 
+void Musi45effectAudioProcessorEditor::setPresets(float values[]) {
+    values[0] = getProcessor().usrParams[Musi45effectAudioProcessor::lfoSpeedParam].getUparamVal();
+    values[1] = getProcessor().usrParams[Musi45effectAudioProcessor::lfoDepthParam].getUparamVal();
+    values[2] = getProcessor().usrParams[Musi45effectAudioProcessor::feedbackParam].getUparamVal();
+    values[3] = getProcessor().usrParams[Musi45effectAudioProcessor::delayTimeParam].getUparamVal();
+    values[4] = getProcessor().usrParams[Musi45effectAudioProcessor::wetParam].getUparamVal();
+    values[5] = getProcessor().usrParams[Musi45effectAudioProcessor::dryParam].getUparamVal();
+}
+
+void Musi45effectAudioProcessorEditor::usePreset(float values[]) {
+    getProcessor().usrParams[Musi45effectAudioProcessor::lfoSpeedParam].setWithUparam(values[0]);
+    getProcessor().usrParams[Musi45effectAudioProcessor::lfoDepthParam].setWithUparam(values[1]);
+    getProcessor().usrParams[Musi45effectAudioProcessor::feedbackParam].setWithUparam(values[2]);
+    getProcessor().usrParams[Musi45effectAudioProcessor::delayTimeParam].setWithUparam(values[3]);
+    getProcessor().usrParams[Musi45effectAudioProcessor::wetParam].setWithUparam(values[4]);
+    getProcessor().usrParams[Musi45effectAudioProcessor::dryParam].setWithUparam(values[5]);
+}
 
