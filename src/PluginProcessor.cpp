@@ -32,9 +32,11 @@ Musi45effectAudioProcessor::Musi45effectAudioProcessor()
     usrParams[wetParam].setMinMax(minW, maxW);
     usrParams[wetParam].setWithUparam(defW);
     
-    usrParams[dryParam].setMinMax(minW, maxW);
-    usrParams[dryParam].setWithUparam(defW);
-
+    usrParams[dryParam].setMinMax(minDr, maxDr);
+    usrParams[dryParam].setWithUparam(defDr);
+    
+    calcFilterCoeffs();
+    calcDelays(myLFO.tick());
 }
 
 Musi45effectAudioProcessor::~Musi45effectAudioProcessor()
@@ -112,7 +114,7 @@ float Musi45effectAudioProcessor::getParameterDefaultValue (int index)
         case wetParam:
             return defW;
         case dryParam:
-            return defW; //todo: defD
+            return defDr;
         default:
             break;
     }
@@ -230,14 +232,13 @@ void Musi45effectAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     // initialisation that you need..
     fs = sampleRate;
     
-    int samps = 500 * fs * .001;
-    delayL.setMaximumDelay(samps);
-    delayR.setMaximumDelay(samps);
+    int samps = maxD * fs * .001;
+    DelayL.setMaximumDelay(samps);
+    DelayR.setMaximumDelay(samps);
     
     // calc all alg params
-    setLfoFreq();
     calcDelays(lfo);
-    
+    calcFilterCoeffs();
     // init the control rate counter
     cntrlCounter = 0;
 }
@@ -245,8 +246,11 @@ void Musi45effectAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
 // Calculate lfo stuff
 void Musi45effectAudioProcessor::setLfoFreq()
 {
-    float lfoFreq = usrParams[lfoSpeedParam].getUparamVal();
-    myLFO.setFreq(lfoFreq, fs/cntrlN);  // since the LFO only gets called every N samps, divide fs by N
+    float delaytime = usrParams[delayTimeParam].getUparamVal();
+    float hertz = 1.0f/(delaytime*.001);
+    myLFO.setFreq(hertz, fs/cntrlN);
+    usrParams[lfoSpeedParam].setWithUparam(hertz);
+    // since the LFO only gets called every N samps, divide fs by N
 }
 
 void Musi45effectAudioProcessor::calcFBW()
@@ -255,14 +259,26 @@ void Musi45effectAudioProcessor::calcFBW()
     wet = usrParams[wetParam].getUparamVal() * .01;
 }
 
+void Musi45effectAudioProcessor::calcFilterCoeffs()
+{
+    float coeffs[2];
+    float fc = 500;
+    
+    Mu45FilterCalc::calcCoeffs1PoleLPF(coeffs, fc, fs);
+    filterL.setCoefficients(coeffs[0], coeffs[1]);
+    filterR.setCoefficients(coeffs[0], coeffs[1]);
+}
+
 //Calculates delay time
 void Musi45effectAudioProcessor::calcDelays(float LFO)
 {
-    float msec = usrParams[delayTimeParam].getUparamVal();
-    int samps = msec * fs * .001;
+    float sec = usrParams[delayTimeParam].getUparamVal()*.001;
+    DelayL.setDelay(sec*fs);
+    DelayR.setDelay(sec*fs);
+    int samps = 30 * fs * .001;
     samps = samps + .5*samps*LFO*(.01)*(usrParams[lfoDepthParam].getUparamVal());
-    delayL.setDelay(samps);
-    delayR.setDelay(samps);
+    ChorusDelayL.setDelay(samps);
+    ChorusDelayR.setDelay(samps);
 }
 
 void Musi45effectAudioProcessor::releaseResources()
@@ -286,7 +302,7 @@ void Musi45effectAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBu
     float* channelDataR = buffer.getWritePointer (1);
     
     float inSampL, inSampR;
-    float tempL, tempR;
+    float CtempL, CtempR, tempL, tempR, filteredL, filteredR, pannedL, pannedR;
     
     // The "inner loop"
     for (int i = 0; i < numSamples; ++i)
@@ -298,23 +314,46 @@ void Musi45effectAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBu
         // control rate stuff
         if (cntrlCounter % cntrlN == 0)
         {
-            
+            setLfoFreq();
             lfo = myLFO.tick();         // lfo varies between -1.0 and 1.0
+            //cout << lfo << endl;
+            calcDelays(lfo);
+            calcFBW();
             pan = (lfo+1)/2;
             leftgain = cos(pan*(PI/2.0f));
             rightgain = sin((pan)*(PI/2.0f));
-            calcDelays(lfo);
-            calcFBW();
         }
         cntrlCounter++;     // update the control rate counter
         
-        tempL = delayL.lastOut();
-        tempR = delayR.lastOut();
-        delayL.tick(inSampL + feedback*(tempL));
-        delayR.tick(inSampR + feedback*(tempR));
+        //Crazy voice effect
+        /*
+         tempL = ChorusDelayL.lastOut();
+         tempR = ChorusDelayR.lastOut();
+         ChorusDelayL.tick(inSampL + feedback*(tempL));
+         ChorusDelayR.tick(inSampR + feedback*(tempR));
+         
+         channelDataL[i] = leftgain*(channelDataL[i] + wet*tempL);
+         channelDataR[i] = rightgain*(channelDataR[i] + wet*tempR);
+         */
         
-        channelDataL[i] = leftgain*(channelDataL[i] + wet*tempL);
-        channelDataR[i] = rightgain*(channelDataR[i] + wet*tempR);
+        tempL = DelayL.lastOut();
+        tempR = DelayR.lastOut();
+        filteredL = filterL.tick(tempL);
+        filteredR = filterR.tick(tempR);
+        CtempL = ChorusDelayL.lastOut();
+        CtempR = ChorusDelayR.lastOut();
+        ChorusDelayL.tick(filteredL + feedback*(CtempL));
+        ChorusDelayR.tick(filteredR + feedback*(CtempR));
+        
+        pannedL = leftgain*CtempL;
+        pannedR = rightgain*CtempR;
+        
+        DelayL.tick(channelDataL[i] + .85*tempL);
+        DelayR.tick(channelDataR[i] + .85*tempR);
+        
+        
+        channelDataL[i] = (dry*channelDataL[i] + wet*pannedL);
+        channelDataR[i] = (dry*channelDataR[i] + wet*pannedR);
     }
 }
 

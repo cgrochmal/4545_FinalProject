@@ -34,6 +34,8 @@ public:
     void buttonStateChanged (Button *) override;
     void buttonClicked (Button *) override;
     void timerCallback() override;              // add the timer callback function
+    void setPresets(float values[]);
+    void usePreset(float values[]);
     
 private:
     // This reference is provided as a quick way for your editor to
@@ -71,9 +73,9 @@ private:
     
     // Add any other private variables you need here.
     
-//    std::clock_t current;
-//    std::clock_t previous;
-//    std::clock_t clockstaken;
+    //    std::clock_t current;
+    //    std::clock_t previous;
+    //    std::clock_t clockstaken;
     
     Time tempoTimer;
     int current;
@@ -82,10 +84,16 @@ private:
     int firstInterval;
     int secondInterval;
     int thirdInterval;
-    int fourthInterval; 
+    int fourthInterval;
     
-   // Timer * previous;
-   // Timer * clockstaken;
+    float presets1 [6];
+    float presets2 [6];
+    float presets3 [6];
+    float presets4 [6];
+    
+    
+    // Timer * previous;
+    // Timer * clockstaken;
     // STEP 3.5 - Add a method that returns a pointer to the Processor object. This is how the Editor can send data to the processor
     Musi45effectAudioProcessor& getProcessor() const
     {

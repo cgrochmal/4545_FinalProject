@@ -29,12 +29,15 @@
 #define minF 0.0
 #define maxF 100.0
 #define defF 50.0
-#define minD 0.0
-#define maxD 500.0
-#define defD 10.0
+#define minD 50.0
+#define maxD 2000.0
+#define defD 500.0
 #define defW 80.0
 #define minW 0.0
 #define maxW 100.0
+#define minDr 0.0
+#define maxDr 1.0
+#define defDr 0.7
 
 
 //==============================================================================
@@ -120,7 +123,9 @@ private:
     float leftgain, rightgain, pan;
     
     // Filters
-    stk::DelayA delayL, delayR;             // The delays
+    stk::DelayA ChorusDelayL, ChorusDelayR;             // The delays
+    stk::DelayA DelayL, DelayR;
+    stk::OnePole filterL, filterR;
     // LFO
     Mu45LFO myLFO;
     
@@ -128,6 +133,7 @@ private:
     void setLfoFreq();
     void calcDelays(float LFO);
     void calcFBW();
+    void calcFilterCoeffs();
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Musi45effectAudioProcessor)
     
